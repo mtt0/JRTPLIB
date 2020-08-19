@@ -46,6 +46,17 @@
 
 #include "rtpdebug.h"
 
+#include <iostream>
+#include <iomanip>
+
+void HexDump(const uint8_t *mem, size_t n) {
+  std::cerr << std::endl << '[';
+  for (size_t i = 0; i < n; i++) {
+	std::cerr << std::hex << std::setw(2) << std::setfill('0') << uint16_t(mem[i]) << " ";
+  }
+  std::cerr << ']' << std::endl;
+}
+
 namespace jrtplib
 {
 
@@ -122,6 +133,7 @@ int RTPPacket::ParseRawPacket(RTPRawPacket &rawpack)
 		return ERR_RTP_PACKET_INVALIDPACKET;
 	
 	packetbytes = (uint8_t *)rawpack.GetData();
+	HexDump(packetbytes, packetlen);
 	rtpheader = (RTPHeader *)packetbytes;
 	
 	// The version number should be correct
@@ -193,6 +205,7 @@ int RTPPacket::ParseRawPacket(RTPRawPacket &rawpack)
 
 	RTPPacket::timestamp = ntohl(rtpheader->timestamp);
 	RTPPacket::ssrc = ntohl(rtpheader->ssrc);
+	std::cerr << "ssrc: " << RTPPacket::ssrc << std::endl;
 	RTPPacket::packet = packetbytes;
 	RTPPacket::payload = packetbytes+payloadoffset;
 	RTPPacket::packetlength = packetlen;
